@@ -7,7 +7,4 @@ router.post("/login", UserController.login);
 router.get("/getAllUsers", UserController.getAllUsers);
 router.get("/findUsers", UserController.findUsers);
 
-
 export default router;
-
-//module.exports = router;

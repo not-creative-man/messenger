@@ -19,5 +19,25 @@ services:
       timeout: 5s
       retries: 5
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    environment:
+      - DB_NAME=${DB_NAME:-m_db}
+      - DB_USER=${DB_USER:-m_admin}
+      - DB_PASSWORD=${DB_PASSWORD:-m_12345678}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npx nodemon --inspect=0.0.0.0:9229 src/app.js
+
 volumes:
   postgres_data:
