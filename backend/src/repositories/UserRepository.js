@@ -47,7 +47,9 @@ class UserRepository {
 
     async getAllUsers() {
         Logger.log("UserRepository", "getAllUsers", true);
-        const rows = await UserModel.findAll({})
+        const rows = await UserModel.findAll({
+            attributes: ['id', 'login', 'email', 'name', 'avatar_url', 'birth'],
+        });
         Logger.log("UserRepository", "getAllUsers", false, rows);
         return rows;
     }
@@ -55,6 +57,7 @@ class UserRepository {
     async findByName(name) {
         Logger.log("UserRepository", "findByName", true, name);
         const rows = await UserModel.findAll({
+            attributes: ['id', 'login', 'email', 'name', 'avatar_url', 'birth'],
             where: {
                 name: {
                     [Op.like]: name,
