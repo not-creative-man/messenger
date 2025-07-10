@@ -51,6 +51,13 @@ class UserService {
         Logger.log("UserService", "findUsers", false, users);
         return users;
     }
+
+    async findUserById(userData){
+        Logger.log("UserService", "findUserById", true, userData);
+        const users = await UserRepository.findById('%' + userData.id + '%');
+        Logger.log("UserService", "findUserById", false, users);
+        return users;
+    }
 }
 
 export default new UserService();

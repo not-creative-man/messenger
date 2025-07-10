@@ -14,6 +14,18 @@ class UserRepository {
         return findData[0];
     }
 
+    async findById(id) {
+        Logger.log("UserRepository", "findById", true, id);
+        const findData = await UserModel.findAll({
+            attributes: ['id', 'login', 'email', 'name', 'avatar_url', 'birth'],
+            where: {
+                id: id
+            }
+        });
+        Logger.log("UserRepository", "findById", false, findData);
+        return findData[0];
+    }
+
     async createUser(user) {
         Logger.log("UserRepository", "createUser", true, user);
         const result = await UserModel.create(user);

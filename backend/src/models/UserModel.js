@@ -1,4 +1,4 @@
-import { Model, DataTypes} from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import sequelize from '../db/connection.js';
 class UserModel extends Model {}
 
@@ -45,6 +45,7 @@ UserModel.init({
     }
 }, {
     sequelize,
+    tableName: 'users',
     modelName: 'user',
     timestamps: false
 });

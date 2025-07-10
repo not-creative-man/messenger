@@ -40,6 +40,16 @@ class UserController {
         } catch(error){
             res.status(400).json({error: error.message});
         }
+    }
+
+    async findUserById(req,res){
+        try{
+            Logger.log("UserController", "findUserById", true, req.query);
+            const users = await UserService.findUserById(req.query);
+            res.status(200).json(users);
+        } catch(error){
+            res.status(400).json({error: error.message});
+        }
 
     }
 }
