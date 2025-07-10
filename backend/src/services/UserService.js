@@ -54,7 +54,7 @@ class UserService {
 
     async findUserById(userData){
         Logger.log("UserService", "findUserById", true, userData);
-        const users = await UserRepository.findById('%' + userData.id + '%');
+        const users = await UserRepository.findById(userData.id);
         Logger.log("UserService", "findUserById", false, users);
         return users;
     }

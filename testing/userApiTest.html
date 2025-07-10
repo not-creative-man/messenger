@@ -101,6 +101,16 @@
     <pre id="searchResult"></pre>
 </div>
 
+<!-- Поиск пользователей -->
+<div class="section">
+    <h2>Поиск пользователей по ID</h2>
+    <form id="searchByIdForm">
+        <input type="text" name="query" placeholder="Поиск по имени или логину">
+        <button type="submit">Найти</button>
+    </form>
+    <pre id="searchByIdResult"></pre>
+</div>
+
 <script>
     // Общая функция для отправки запросов
     async function sendRequest(url, method, data) {
@@ -190,6 +200,23 @@
         });
 
         const resultElement = document.getElementById('searchResult');
+        if (result.success) {
+            resultElement.textContent = JSON.stringify(result.data, null, 2);
+        } else {
+            resultElement.textContent = `Ошибка: ${result.error}`;
+        }
+    });
+
+    document.getElementById('searchByIdForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = e.target.query.value;
+        const token = localStorage.getItem('authToken');
+
+        const result = await sendRequest(`http://localhost:3000/api/user/findUserById?id=${encodeURIComponent(query)}`, 'GET', null, {
+            'Authorization': `Bearer ${token}`
+        });
+
+        const resultElement = document.getElementById('searchByIdResult');
         if (result.success) {
             resultElement.textContent = JSON.stringify(result.data, null, 2);
         } else {
