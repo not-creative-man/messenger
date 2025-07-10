@@ -18,24 +18,29 @@ class UserService {
         userData.password_hash = Hasher.hashing(userData.password);
         userData.created_at = new Date();
         userData.updated_at = new Date();
+        userData.salt = Hasher.getSalt();
         const userId = await UserRepository.createUser(userData);
 
         Logger.log("UserService", "registerUser", false, userId);
-        return {
-            userId
-        };
+        return userId;
     }
 
     async loginUser(userData){
         Logger.log("UserService", "loginUser", true, userData);
-        userData.password_hash = Hasher.hashing(userData.password);
-        const existingUser = await UserRepository.loginUser(userData);
-
+        const existingUser = await UserRepository.findByLogin(userData.login);
         if (!existingUser) {
             throw new Error('User not found');
         }
-        Logger.log("UserService", "loginUser", false, existingUser);
-        return existingUser.id;
+
+        const salt = await UserRepository.findSalt(userData.login);
+        userData.password_hash = Hasher.hashing(userData.password, salt.salt);
+        const loggedInUser = await UserRepository.loginUser(userData);
+
+        if (!loggedInUser) {
+            throw new Error('User not found');
+        }
+        Logger.log("UserService", "loginUser", false, loggedInUser);
+        return loggedInUser.id;
     }
 
     async getAllUsers(){

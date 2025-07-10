@@ -42,6 +42,10 @@ UserModel.init({
     updated_at: {
         type: DataTypes.DATE,
         allowNull: false,
+    },
+    salt: {
+        type: DataTypes.STRING,
+        allowNull: false,
     }
 }, {
     sequelize,

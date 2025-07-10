@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
     avatar_url VARCHAR(255),
     birth DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    salt VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS dialogues (

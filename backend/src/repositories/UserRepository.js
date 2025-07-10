@@ -33,6 +33,18 @@ class UserRepository {
         return result.id;
     }
 
+    async findSalt(login){
+        Logger.log("UserRepository", "findSalt", true, login);
+        const result = await UserModel.findAll({
+            attributes: ['salt'],
+            where: {
+                login: login,
+            }
+        });
+        Logger.log("UserRepository", "findSalt", false, result);
+        return result[0];
+    }
+
     async loginUser(user) {
         Logger.log("UserRepository", "loginUser", true, user);
         const result = await UserModel.findAll({
