@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестирование User API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        form {
+            display: grid;
+            grid-gap: 10px;
+            margin-bottom: 15px;
+        }
+        input, button {
+            padding: 8px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h1>Тестирование User API</h1>
+
+<!-- Регистрация -->
+<div class="section">
+    <h2>Регистрация пользователя</h2>
+    <form id="registerForm">
+        <input type="text" name="login" placeholder="Логин" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <input type="text" name="name" placeholder="Имя">
+        <input type="text" name="avatar_url" placeholder="URL аватара">
+        <input type="date" name="birth" placeholder="Дата рождения">
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+    <div id="registerResult"></div>
+</div>
+
+<!-- Вход -->
+<div class="section">
+    <h2>Вход пользователя</h2>
+    <form id="loginForm">
+        <input type="text" name="login" placeholder="Логин или Email" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
+    <div id="loginResult"></div>
+</div>
+
+<!-- Получение всех пользователей -->
+<div class="section">
+    <h2>Получить всех пользователей</h2>
+    <button id="getAllUsersBtn">Получить всех</button>
+    <pre id="allUsersResult"></pre>
+</div>
+
+<!-- Поиск пользователей -->
+<div class="section">
+    <h2>Поиск пользователей</h2>
+    <form id="searchForm">
+        <input type="text" name="query" placeholder="Поиск по имени или логину">
+        <button type="submit">Найти</button>
+    </form>
+    <pre id="searchResult"></pre>
+</div>
+
+<script>
+    // Общая функция для отправки запросов
+    async function sendRequest(url, method, data) {
+        const options = {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        try {
+            const response = await fetch(url, options);
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Ошибка запроса');
+            }
+
+            return { success: true, data: result };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // Регистрация
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const result = await sendRequest('http://localhost:3000/api/user/register', 'POST', data);
+        const resultElement = document.getElementById('registerResult');
+
+        if (result.success) {
+            resultElement.innerHTML = `<p class="success">Успешная регистрация! ID: ${result.data.id}</p>`;
+            resultElement.innerHTML += `<pre>${JSON.stringify(result.data, null, 2)}</pre>`;
+        } else {
+            resultElement.innerHTML = `<p class="error">Ошибка: ${result.error}</p>`;
+        }
+    });
+
+    // Вход
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const result = await sendRequest('http://localhost:3000/api/user/login', 'POST', data);
+        const resultElement = document.getElementById('loginResult');
+
+        if (result.success) {
+            resultElement.innerHTML = `<p class="success">Успешный вход! Токен: ${result.data.token || 'получен'}</p>`;
+            // Сохраняем токен для последующих запросов
+            localStorage.setItem('authToken', result.data.token);
+        } else {
+            resultElement.innerHTML = `<p class="error">Ошибка: ${result.error}</p>`;
+        }
+    });
+
+    // Получение всех пользователей
+    document.getElementById('getAllUsersBtn').addEventListener('click', async () => {
+        const token = localStorage.getItem('authToken');
+        const result = await sendRequest('http://localhost:3000/api/user/getAllUsers', 'GET', null, {
+            'Authorization': `Bearer ${token}`
+        });
+
+        const resultElement = document.getElementById('allUsersResult');
+        if (result.success) {
+            resultElement.textContent = JSON.stringify(result.data, null, 2);
+        } else {
+            resultElement.textContent = `Ошибка: ${result.error}`;
+        }
+    });
+
+    // Поиск пользователей
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = e.target.query.value;
+        const token = localStorage.getItem('authToken');
+
+        const result = await sendRequest(`http://localhost:3000/api/user/findUsers?name=${encodeURIComponent(query)}`, 'GET', null, {
+            'Authorization': `Bearer ${token}`
+        });
+
+        const resultElement = document.getElementById('searchResult');
+        if (result.success) {
+            resultElement.textContent = JSON.stringify(result.data, null, 2);
+        } else {
+            resultElement.textContent = `Ошибка: ${result.error}`;
+        }
+    });
+</script>
+</body>
+</html>
