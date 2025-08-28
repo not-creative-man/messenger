@@ -2,23 +2,34 @@
   "compilerOptions": {
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2022",
+    "target": "esnext",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "NodeNext",
+    "lib": ["esnext", "DOM", "DOM.Iterable"],
+    "module": "esnext",
     "skipLibCheck": true,
-    "moduleResolution": "nodenext",
+
+    /* Bundler mode — рекомендуемый в TS 5+ */
+    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+
     "noEmit": true,
     "jsx": "react-jsx",
+
+    /* Linting / строгий режим */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Чтобы можно было легко импортировать из src */
+    "baseUrl": "./src",
+    "paths": {
+      "@types/*": ["types/*"]
+    }
   },
   "include": ["src"]
 }
